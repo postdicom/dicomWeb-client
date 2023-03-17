@@ -1,4 +1,6 @@
 ﻿
+using Newtonsoft.Json;
+
 namespace HelloWorld
 {
     class Program
@@ -7,7 +9,7 @@ namespace HelloWorld
         string userName = "your PostDICOM user name";
         string password = "your PostDICOM password";
         string webAddress = "PostDICOM DicomWeb server Address";
-        
+
         static void Main(string[] args)
         {
             program = new Program();
@@ -21,9 +23,10 @@ namespace HelloWorld
             Console.WriteLine("1) Upload DICOM Images in a folder");
             Console.WriteLine("2) QIDO Search");
             Console.WriteLine("3) WadoRS Retrieve Images");
-            Console.WriteLine("4) Exit");
+            Console.WriteLine("4) Create share link");
+            Console.WriteLine("5) Exit");
             Console.Write("\r\nSelect an option: ");
- 
+
             switch (Console.ReadLine())
             {
                 case "1":
@@ -37,12 +40,16 @@ namespace HelloWorld
                     RetrieveImagesUsingWadoRs();
                     Console.ReadLine();
                     return true;
+                case "4":
+                    CreateShareLink();
+                    Console.ReadLine();
+                    return true;
                 default:
                     return true;
             }
         }
 
-#region Upload Images to DicomWeb Server
+        #region Upload Images to DicomWeb Server
 
         private void UploadDicomImagesInAFolder()
         {
@@ -76,21 +83,21 @@ namespace HelloWorld
 
             Console.ReadLine();
         }
-        
+
         public async void UploadImagesToDicomWebServer(List<string> fileNamesList)
         {
             if (fileNamesList == null)
                 return;
 
             var mimeType = "application/dicom";
- 
+
             for (int i = 0; i < fileNamesList.Count; i++)
             {
                 string fileName = fileNamesList[i];
                 try
                 {
-                    Console.WriteLine("Uploading (" + (i+1) + "/" + fileNamesList.Count + ") FilePath = " + Path.GetFullPath(fileName) + " to DicomWebServer");
-                    
+                    Console.WriteLine("Uploading (" + (i + 1) + "/" + fileNamesList.Count + ") FilePath = " + Path.GetFullPath(fileName) + " to DicomWebServer");
+
                     StreamContent sContent = new StreamContent(File.OpenRead(fileName));
                     sContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mimeType);
 
@@ -106,7 +113,7 @@ namespace HelloWorld
                     string message = "Error while uploading file = " + fileName + "\nReason = " + ex.Message;
                     if (ex.InnerException != null)
                         message += "\nInnerException = " + ex.InnerException.Message;
-                }  
+                }
             }
 
             Console.WriteLine("");
@@ -127,10 +134,10 @@ namespace HelloWorld
             try
             {
                 string url = webAddress + "/";
-               
+
                 HttpClient client = new HttpClient();
                 client.DefaultRequestHeaders.Add("ContentType", "application/json");
-                
+
                 var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(userName + ":" + password);
                 string val = System.Convert.ToBase64String(plainTextBytes);
                 client.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
@@ -156,9 +163,9 @@ namespace HelloWorld
             }
         }
 
-#endregion - Upload Images to DicomWeb Server
+        #endregion - Upload Images to DicomWeb Server
 
-#region Query DICOM objects
+        #region Query DICOM objects
 
         /// <summary>
         /// Search for DICOM objects (QIDO-RS) example 
@@ -215,7 +222,7 @@ namespace HelloWorld
                 return;
             }
 
-    
+
             if (level == "SearchStudies-using-PatientID")
             {
                 string url = webAddress + "/studies?00100020=" + qidoSearchParameter;
@@ -288,10 +295,10 @@ namespace HelloWorld
 
             Console.WriteLine("QidoSearch method finished. Press Enter to continue.");
         }
-        
-#endregion - Query DICOM objects
 
-#region Retrieve Images using WadoRS
+        #endregion - Query DICOM objects
+
+        #region Retrieve Images using WadoRS
 
         private async void RetrieveImagesUsingWadoRs()
         {
@@ -378,7 +385,7 @@ namespace HelloWorld
             string val = System.Convert.ToBase64String(plainTextBytes);
             httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
 
-            
+
             HttpResponseMessage response = httpClient.GetAsync(url).Result;
 
             if (response.Content.Headers.ContentType == null)
@@ -396,7 +403,7 @@ namespace HelloWorld
                     var content = await response.Content.ReadAsMultipartAsync();
 
                     DateTime now = DateTime.Now;
-                    string fileRoot = Directory.GetCurrentDirectory() + "/" + now.Year.ToString("0000") + now.Month.ToString("00") + now.Day.ToString("00") + "-" + 
+                    string fileRoot = Directory.GetCurrentDirectory() + "/" + now.Year.ToString("0000") + now.Month.ToString("00") + now.Day.ToString("00") + "-" +
                         now.Hour.ToString("00") + now.Minute.ToString("00") + now.Second.ToString("00") + now.Millisecond.ToString("000");
 
                     int i = 1;
@@ -436,8 +443,94 @@ namespace HelloWorld
             Console.WriteLine("RetrieveAndSaveImages method finished. Press Enter to continue.");
         }
 
-#endregion - Retrieve Images using WadoRS
- 
+        #endregion - Retrieve Images using WadoRS
+
+
+        #region Create Share link
+
+        private async void CreateShareLink()
+        {
+            Console.Clear();
+            Console.Write("Please enter PatientOrderUuid: ");
+            string patientOrderUuid = Console.ReadLine();
+
+            Console.Write("Please enter ExpireDate(YYYY-MM-DD): ");
+            string expireDate = Console.ReadLine();
+
+            Console.Write("Please enter SharePassword: ");
+            string password = Console.ReadLine();
+            bool isDownloadable = false;
+
+            await CreateShareLinkInternal(new List<string>() { patientOrderUuid }, expireDate, password, isDownloadable);
+        }
+
+        private async Task CreateShareLinkInternal(List<string> patientOrderUuidList, string expireDate, string sharePassword, bool isDownloadable)
+        {
+            List<string> patientOrderInfoList = new List<string>();
+
+            foreach (var patientOrderUuid in patientOrderUuidList)
+            {
+                Dictionary<string, string> patientOrderInfoDictionary = new Dictionary<string, string>();
+                patientOrderInfoDictionary.Add("PatientOrderUuid", patientOrderUuid);
+                patientOrderInfoList.Add(JsonConvert.SerializeObject(patientOrderInfoDictionary));
+            }
+
+            Dictionary<string, string> parameterDictionary = new Dictionary<string, string>();
+            parameterDictionary.Add("PatientOrderInfoList", JsonConvert.SerializeObject(patientOrderInfoList));
+            parameterDictionary.Add("ExpireDate", expireDate);
+            parameterDictionary.Add("SharePassword", sharePassword);
+            parameterDictionary.Add("Downloadable", isDownloadable.ToString());
+
+            string url = webAddress + "/createsharelink";
+            await CreateShareLinkDicomWebServer(url, parameterDictionary);
+        }
+
+        private async Task CreateShareLinkDicomWebServer(string url, Dictionary<string, string> parameterDictionary)
+        {
+            try
+            {
+                string result = string.Empty;
+                HttpMessageHandler handler = new HttpClientHandler()
+                {
+                };
+
+                var httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(url),
+                    Timeout = new TimeSpan(0, 2, 0)
+                };
+
+                httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+
+                var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(userName + ":" + password);
+                string val = System.Convert.ToBase64String(plainTextBytes);
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+                httpClient.DefaultRequestHeaders.Add("ShareParameters", JsonConvert.SerializeObject(parameterDictionary));
+
+                HttpResponseMessage response = await httpClient.GetAsync(url);
+                Console.WriteLine("HttpResponseMessage.StatusCode = " + response.StatusCode);
+
+                using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
+                {
+                    result = stream.ReadToEnd();
+                }
+
+                Console.WriteLine("Response text =\n" + result);
+            }
+            catch (Exception ex)
+            {
+                string message = "Error while multicontent.\nReason = " + ex.Message;
+                if (ex.InnerException != null)
+                    message += "\nInnerException = " + ex.InnerException.Message;
+
+                Console.WriteLine(message);
+            }
+
+            Console.WriteLine("QidoSearch method finished. Press Enter to continue.");
+        }
+
+        #endregion Create Share link
 
     }
 }
