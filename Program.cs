@@ -24,7 +24,14 @@ namespace HelloWorld
             Console.WriteLine("2) QIDO Search");
             Console.WriteLine("3) WadoRS Retrieve Images");
             Console.WriteLine("4) Create share link");
-            Console.WriteLine("5) Exit");
+            Console.WriteLine("5) Share patient order with URL");
+            Console.WriteLine("6) Create folder");
+            Console.WriteLine("7) Search folder");
+            Console.WriteLine("8) Share folder with URL");
+            Console.WriteLine("9) Add order to folder");
+            Console.WriteLine("10) Assign order to user");
+            Console.WriteLine("11) Assign order to user group");
+            Console.WriteLine("0) Exit");
             Console.Write("\r\nSelect an option: ");
 
             switch (Console.ReadLine())
@@ -42,6 +49,34 @@ namespace HelloWorld
                     return true;
                 case "4":
                     CreateShareLink();
+                    Console.ReadLine();
+                    return true;
+                case "5":
+                    SharePatientOrderWithUrl();
+                    Console.ReadLine();
+                    return true;
+                case "6":
+                    CreateFolder();
+                    Console.ReadLine();
+                    return true;
+                case "7":
+                    SearchFolder();
+                    Console.ReadLine();
+                    return true;
+                case "8":
+                    ShareFolderWithUrl();
+                    Console.ReadLine();
+                    return true;
+                case "9":
+                    AddOrderToFolder();
+                    Console.ReadLine();
+                    return true;
+                case "10":
+                    AssignOrderToUser();
+                    Console.ReadLine();
+                    return true;
+                case "11":
+                    AssignOrderToUserGroup();
                     Console.ReadLine();
                     return true;
                 default:
@@ -532,5 +567,544 @@ namespace HelloWorld
 
         #endregion Create Share link
 
+        #region Share patient order with url
+
+        private async void SharePatientOrderWithUrl()
+        {
+            Console.Clear();
+            Console.Write("Please enter PatientOrderUuid: ");
+            string patientOrderUuid = Console.ReadLine();
+
+            Console.Write("Please enter ExpireDate(YYYY-MM-DD): ");
+            string expireDate = Console.ReadLine();
+
+            Console.Write("Please enter SharePassword: ");
+            string password = Console.ReadLine();
+            
+            Console.Write("Please enter GetOrdersInFolder(true or false): ");
+            bool userCanDownloadStudies = Console.ReadLine() == "true";
+
+            await SharePatientOrderWithUrlInternal(new List<string>() { patientOrderUuid }, expireDate, password, userCanDownloadStudies);
+        }
+
+        private async Task SharePatientOrderWithUrlInternal(List<string> patientOrderUuidList, string expireDate, string sharePassword, bool userCanDownloadStudies)
+        {
+            Dictionary<string, string> parameterDictionary = new Dictionary<string, string>();
+            parameterDictionary.Add("OrderUuidList", JsonConvert.SerializeObject(patientOrderUuidList));
+            parameterDictionary.Add("ExpireDate", expireDate);
+            parameterDictionary.Add("SharePassword", sharePassword);
+            parameterDictionary.Add("UserCanDownloadStudies", userCanDownloadStudies.ToString());
+
+            string url = webAddress + "/sharepatientorderwithurl";
+            await SharePatientOrderWithUrlDicomWebServer(url, parameterDictionary);
+        }
+
+        private async Task SharePatientOrderWithUrlDicomWebServer(string url, Dictionary<string, string> parameterDictionary)
+        {
+            try
+            {
+                string result = string.Empty;
+                HttpMessageHandler handler = new HttpClientHandler()
+                {
+                };
+
+                var httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(url),
+                    Timeout = new TimeSpan(0, 2, 0)
+                };
+
+                httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+
+                var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(userName + ":" + password);
+                string val = System.Convert.ToBase64String(plainTextBytes);
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+                httpClient.DefaultRequestHeaders.Add("SharePatientOrderParameters", JsonConvert.SerializeObject(parameterDictionary));
+
+                HttpResponseMessage response = await httpClient.GetAsync(url);
+                Console.WriteLine("HttpResponseMessage.StatusCode = " + response.StatusCode);
+
+                using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
+                {
+                    result = stream.ReadToEnd();
+                }
+
+                Console.WriteLine("Response text =\n" + result);
+            }
+            catch (Exception ex)
+            {
+                string message = "Error while multicontent.\nReason = " + ex.Message;
+                if (ex.InnerException != null)
+                    message += "\nInnerException = " + ex.InnerException.Message;
+
+                Console.WriteLine(message);
+            }
+
+            Console.WriteLine("QidoSearch method finished. Press Enter to continue.");
+        }
+
+        #endregion Share patient order with url
+
+        #region Create Folder
+
+        private async void CreateFolder()
+        {
+            Console.Clear();
+            Console.Write("Please enter FolderName: ");
+            string folderName = Console.ReadLine();
+
+            Console.Write("Please enter FolderDescription: ");
+            string folderDescription = Console.ReadLine();
+
+            Console.Write("Please enter ParentFolderUuid: ");
+            string parentFolderUuid = Console.ReadLine();
+
+            await CreateFolderInternal(folderName, folderDescription, parentFolderUuid);
+        }
+
+        private async Task CreateFolderInternal(string folderName, string folderDescription, string parentFolderUuid)
+        {
+            Dictionary<string, string> parameterDictionary = new Dictionary<string, string>();
+            parameterDictionary.Add("FolderName", folderName);
+            parameterDictionary.Add("FolderDescription", folderDescription);
+            parameterDictionary.Add("ParentFolderUuid", parentFolderUuid);
+
+            string url = webAddress + "/createfolder";
+            await CreateFolderDicomWebServer(url, parameterDictionary);
+        }
+
+        private async Task CreateFolderDicomWebServer(string url, Dictionary<string, string> parameterDictionary)
+        {
+            try
+            {
+                string result = string.Empty;
+                HttpMessageHandler handler = new HttpClientHandler()
+                {
+                };
+
+                var httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(url),
+                    Timeout = new TimeSpan(0, 2, 0)
+                };
+
+                httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+
+                var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(userName + ":" + password);
+                string val = System.Convert.ToBase64String(plainTextBytes);
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+                httpClient.DefaultRequestHeaders.Add("CreateFolderParameters", JsonConvert.SerializeObject(parameterDictionary));
+
+                HttpResponseMessage response = await httpClient.GetAsync(url);
+                Console.WriteLine("HttpResponseMessage.StatusCode = " + response.StatusCode);
+
+                using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
+                {
+                    result = stream.ReadToEnd();
+                }
+
+                Console.WriteLine("Response text =\n" + result);
+            }
+            catch (Exception ex)
+            {
+                string message = "Error while multicontent.\nReason = " + ex.Message;
+                if (ex.InnerException != null)
+                    message += "\nInnerException = " + ex.InnerException.Message;
+
+                Console.WriteLine(message);
+            }
+
+            Console.WriteLine("QidoSearch method finished. Press Enter to continue.");
+        }
+
+        #endregion Create Folder
+
+        #region Search Folder
+
+        private async void SearchFolder()
+        {
+            Console.Clear();
+            Console.Write("Please enter ParentFolderUuid: ");
+            string parentFolderUuid = Console.ReadLine();
+
+            Console.Write("Please enter FolderName: ");
+            string folderName = Console.ReadLine();
+
+            Console.Write("Please enter GetOrdersInFolder(true or false): ");
+            bool getOrdersInFolder = Console.ReadLine() == "true";
+
+            
+
+            await SearchFolderInternal(parentFolderUuid, folderName, getOrdersInFolder);
+        }
+
+        private async Task SearchFolderInternal(string parentFolderUuid, string folderName, bool getOrdersInFolder)
+        {
+            Dictionary<string, string> parameterDictionary = new Dictionary<string, string>();
+            parameterDictionary.Add("ParentFolderUuid", parentFolderUuid);
+            parameterDictionary.Add("FolderName", folderName);
+            parameterDictionary.Add("GetOrdersInFolder", getOrdersInFolder.ToString());
+
+            string url = webAddress + "/searchfolder";
+            await SearchFolderDicomWebServer(url, parameterDictionary);
+        }
+
+        private async Task SearchFolderDicomWebServer(string url, Dictionary<string, string> parameterDictionary)
+        {
+            try
+            {
+                string result = string.Empty;
+                HttpMessageHandler handler = new HttpClientHandler()
+                {
+                };
+
+                var httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(url),
+                    Timeout = new TimeSpan(0, 2, 0)
+                };
+
+                httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+
+                var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(userName + ":" + password);
+                string val = System.Convert.ToBase64String(plainTextBytes);
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+                httpClient.DefaultRequestHeaders.Add("SearchFolderParameters", JsonConvert.SerializeObject(parameterDictionary));
+
+                HttpResponseMessage response = await httpClient.GetAsync(url);
+                Console.WriteLine("HttpResponseMessage.StatusCode = " + response.StatusCode);
+
+                using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
+                {
+                    result = stream.ReadToEnd();
+                }
+
+
+                Console.WriteLine("Response text =\n" + result);
+            }
+            catch (Exception ex)
+            {
+                string message = "Error while multicontent.\nReason = " + ex.Message;
+                if (ex.InnerException != null)
+                    message += "\nInnerException = " + ex.InnerException.Message;
+
+                Console.WriteLine(message);
+            }
+
+            Console.WriteLine("QidoSearch method finished. Press Enter to continue.");
+        }
+
+        #endregion Search Folder
+    
+        #region  Share Folder with url
+
+        private async void ShareFolderWithUrl()
+        {
+            Console.Clear();
+            Console.Write("Please enter FolderUuid: ");
+            string folderUuid = Console.ReadLine();
+
+            Console.Write("Please enter SharePassword: ");
+            string sharePassword = Console.ReadLine();
+
+            Console.Write("Please enter ShareTitle: ");
+            string shareTitle = Console.ReadLine();
+
+            Console.Write("Please enter ShareDescription: ");
+            string shareDescription = Console.ReadLine();
+
+            Console.Write("Please enter ExpireDate(YYYY-MM-DD): ");
+            string expireDate = Console.ReadLine();
+
+            Console.Write("Please enter UserCanDownloadStudies(true or false): ");
+            bool userCanDownloadStudies = Console.ReadLine() == "true";
+
+            
+
+            await ShareFolderWithUrlInternal(folderUuid, sharePassword, shareTitle, shareDescription, expireDate, userCanDownloadStudies);
+        }
+
+        private async Task ShareFolderWithUrlInternal(string folderUuid, string sharePassword, string shareTitle, string shareDescription, string expireDate, bool userCanDownloadStudies)
+        {
+            Dictionary<string, string> parameterDictionary = new Dictionary<string, string>();
+            parameterDictionary.Add("FolderUuid", folderUuid);
+            parameterDictionary.Add("SharePassword", sharePassword);
+            parameterDictionary.Add("ShareTitle", shareTitle);
+            parameterDictionary.Add("ShareDescription", shareDescription);
+            parameterDictionary.Add("ExpireDate", expireDate);
+            parameterDictionary.Add("UserCanDownloadStudies", userCanDownloadStudies.ToString());
+
+            string url = webAddress + "/sharefolderwithurl";
+            await ShareFolderWithUrlDicomWebServer(url, parameterDictionary);
+        }
+
+        private async Task ShareFolderWithUrlDicomWebServer(string url, Dictionary<string, string> parameterDictionary)
+        {
+            try
+            {
+                string result = string.Empty;
+                HttpMessageHandler handler = new HttpClientHandler()
+                {
+                };
+
+                var httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(url),
+                    Timeout = new TimeSpan(0, 2, 0)
+                };
+
+                httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+
+                var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(userName + ":" + password);
+                string val = System.Convert.ToBase64String(plainTextBytes);
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+                httpClient.DefaultRequestHeaders.Add("ShareFolderParameters", JsonConvert.SerializeObject(parameterDictionary));
+
+                HttpResponseMessage response = await httpClient.GetAsync(url);
+                Console.WriteLine("HttpResponseMessage.StatusCode = " + response.StatusCode);
+
+                using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
+                {
+                    result = stream.ReadToEnd();
+                }
+
+                Console.WriteLine("Response text =\n" + result);
+            }
+            catch (Exception ex)
+            {
+                string message = "Error while multicontent.\nReason = " + ex.Message;
+                if (ex.InnerException != null)
+                    message += "\nInnerException = " + ex.InnerException.Message;
+
+                Console.WriteLine(message);
+            }
+
+            Console.WriteLine("QidoSearch method finished. Press Enter to continue.");
+        }
+
+        #endregion Share Folder with url
+    
+        #region  Add Order to Folder
+
+        private async void AddOrderToFolder()
+        {
+            Console.Clear();
+            Console.Write("Please enter PatientOrderUuid: ");
+            string patientOrderUuid = Console.ReadLine();
+
+            Console.Write("Please enter FolderUuid: ");
+            string folderUuid = Console.ReadLine();
+
+            
+
+            await AddOrderToFolderInternal(patientOrderUuid, new List<string>() { folderUuid });
+        }
+
+        private async Task AddOrderToFolderInternal(string patientOrderUuid, List<string> folderUuidList)
+        {
+            Dictionary<string, string> parameterDictionary = new Dictionary<string, string>();
+            parameterDictionary.Add("PatientOrderUuid", patientOrderUuid);
+            parameterDictionary.Add("FolderUuidList", JsonConvert.SerializeObject(folderUuidList));
+
+            string url = webAddress + "/addordertofolder";
+            await AddOrderToFolderDicomWebServer(url, parameterDictionary);
+        }
+
+        private async Task AddOrderToFolderDicomWebServer(string url, Dictionary<string, string> parameterDictionary)
+        {
+            try
+            {
+                string result = string.Empty;
+                HttpMessageHandler handler = new HttpClientHandler()
+                {
+                };
+
+                var httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(url),
+                    Timeout = new TimeSpan(0, 2, 0)
+                };
+
+                httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+
+                var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(userName + ":" + password);
+                string val = System.Convert.ToBase64String(plainTextBytes);
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+                httpClient.DefaultRequestHeaders.Add("AddOrderToFolderParameters", JsonConvert.SerializeObject(parameterDictionary));
+
+                HttpResponseMessage response = await httpClient.GetAsync(url);
+                Console.WriteLine("HttpResponseMessage.StatusCode = " + response.StatusCode);
+
+                using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
+                {
+                    result = stream.ReadToEnd();
+                }
+
+                Console.WriteLine("Response text =\n" + result);
+            }
+            catch (Exception ex)
+            {
+                string message = "Error while multicontent.\nReason = " + ex.Message;
+                if (ex.InnerException != null)
+                    message += "\nInnerException = " + ex.InnerException.Message;
+
+                Console.WriteLine(message);
+            }
+
+            Console.WriteLine("QidoSearch method finished. Press Enter to continue.");
+        }
+
+        #endregion Add Order to Folder
+
+        #region  Assign order to user
+
+        private async void AssignOrderToUser()
+        {
+            Console.Clear();
+            Console.Write("Please enter PatientOrderUuid: ");
+            string patientOrderUuid = Console.ReadLine();
+
+            Console.Write("Please enter AssignedUserUuid: ");
+            string assignedUserUuid = Console.ReadLine();
+
+            
+
+            await AssignOrderToUserInternal(patientOrderUuid, assignedUserUuid);
+        }
+
+        private async Task AssignOrderToUserInternal(string patientOrderUuid, string assignedUserUuid)
+        {
+            Dictionary<string, string> parameterDictionary = new Dictionary<string, string>();
+            parameterDictionary.Add("PatientOrderUuid", patientOrderUuid);
+            parameterDictionary.Add("AssignedUserUuid", assignedUserUuid);
+
+            string url = webAddress + "/assignordertouser";
+            await AssignOrderToUserDicomWebServer(url, parameterDictionary);
+        }
+
+        private async Task AssignOrderToUserDicomWebServer(string url, Dictionary<string, string> parameterDictionary)
+        {
+            try
+            {
+                string result = string.Empty;
+                HttpMessageHandler handler = new HttpClientHandler()
+                {
+                };
+
+                var httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(url),
+                    Timeout = new TimeSpan(0, 2, 0)
+                };
+
+                httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+
+                var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(userName + ":" + password);
+                string val = System.Convert.ToBase64String(plainTextBytes);
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+                httpClient.DefaultRequestHeaders.Add("AssignOrderToUserParameters", JsonConvert.SerializeObject(parameterDictionary));
+
+                HttpResponseMessage response = await httpClient.GetAsync(url);
+                Console.WriteLine("HttpResponseMessage.StatusCode = " + response.StatusCode);
+
+                using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
+                {
+                    result = stream.ReadToEnd();
+                }
+
+                Console.WriteLine("Response text =\n" + result);
+            }
+            catch (Exception ex)
+            {
+                string message = "Error while multicontent.\nReason = " + ex.Message;
+                if (ex.InnerException != null)
+                    message += "\nInnerException = " + ex.InnerException.Message;
+
+                Console.WriteLine(message);
+            }
+
+            Console.WriteLine("QidoSearch method finished. Press Enter to continue.");
+        }
+
+        #endregion Assign order to user
+        
+        #region  Assign order to user group
+
+        private async void AssignOrderToUserGroup()
+        {
+            Console.Clear();
+            Console.Write("Please enter PatientOrderUuid: ");
+            string patientOrderUuid = Console.ReadLine();
+
+            Console.Write("Please enter AssignedUserGroupUuid: ");
+            string assignedUserGroupUuid = Console.ReadLine();
+
+            
+
+            await AssignOrderToUserGroupInternal(patientOrderUuid, assignedUserGroupUuid);
+        }
+
+        private async Task AssignOrderToUserGroupInternal(string patientOrderUuid, string assignedUserGroupUuid)
+        {
+            Dictionary<string, string> parameterDictionary = new Dictionary<string, string>();
+            parameterDictionary.Add("PatientOrderUuid", patientOrderUuid);
+            parameterDictionary.Add("AssignedUserGroupUuid", assignedUserGroupUuid);
+
+            string url = webAddress + "/assignordertousergroup";
+            await AssignOrderToUserGroupDicomWebServer(url, parameterDictionary);
+        }
+
+        private async Task AssignOrderToUserGroupDicomWebServer(string url, Dictionary<string, string> parameterDictionary)
+        {
+            try
+            {
+                string result = string.Empty;
+                HttpMessageHandler handler = new HttpClientHandler()
+                {
+                };
+
+                var httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(url),
+                    Timeout = new TimeSpan(0, 2, 0)
+                };
+
+                httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+
+                var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(userName + ":" + password);
+                string val = System.Convert.ToBase64String(plainTextBytes);
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+                httpClient.DefaultRequestHeaders.Add("AssignOrderToUserGroupParameters", JsonConvert.SerializeObject(parameterDictionary));
+
+                HttpResponseMessage response = await httpClient.GetAsync(url);
+                Console.WriteLine("HttpResponseMessage.StatusCode = " + response.StatusCode);
+
+                using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
+                {
+                    result = stream.ReadToEnd();
+                }
+
+                Console.WriteLine("Response text =\n" + result);
+            }
+            catch (Exception ex)
+            {
+                string message = "Error while multicontent.\nReason = " + ex.Message;
+                if (ex.InnerException != null)
+                    message += "\nInnerException = " + ex.InnerException.Message;
+
+                Console.WriteLine(message);
+            }
+
+            Console.WriteLine("QidoSearch method finished. Press Enter to continue.");
+        }
+
+        #endregion Assign order to user group
     }
 }
