@@ -31,6 +31,7 @@ namespace HelloWorld
             Console.WriteLine("9) Add order to folder");
             Console.WriteLine("10) Assign order to user");
             Console.WriteLine("11) Assign order to user group");
+            Console.WriteLine("12) Create patient order");
             Console.WriteLine("0) Exit");
             Console.Write("\r\nSelect an option: ");
 
@@ -77,6 +78,10 @@ namespace HelloWorld
                     return true;
                 case "11":
                     AssignOrderToUserGroup();
+                    Console.ReadLine();
+                    return true;
+                case "12":
+                    CreatePatientOrder();
                     Console.ReadLine();
                     return true;
                 default:
@@ -580,7 +585,7 @@ namespace HelloWorld
 
             Console.Write("Please enter SharePassword: ");
             string password = Console.ReadLine();
-            
+
             Console.Write("Please enter GetOrdersInFolder(true or false): ");
             bool userCanDownloadStudies = Console.ReadLine() == "true";
 
@@ -735,7 +740,7 @@ namespace HelloWorld
             Console.Write("Please enter GetOrdersInFolder(true or false): ");
             bool getOrdersInFolder = Console.ReadLine() == "true";
 
-            
+
 
             await SearchFolderInternal(parentFolderUuid, folderName, getOrdersInFolder);
         }
@@ -798,7 +803,7 @@ namespace HelloWorld
         }
 
         #endregion Search Folder
-    
+
         #region  Share Folder with url
 
         private async void ShareFolderWithUrl()
@@ -822,7 +827,7 @@ namespace HelloWorld
             Console.Write("Please enter UserCanDownloadStudies(true or false): ");
             bool userCanDownloadStudies = Console.ReadLine() == "true";
 
-            
+
 
             await ShareFolderWithUrlInternal(folderUuid, sharePassword, shareTitle, shareDescription, expireDate, userCanDownloadStudies);
         }
@@ -887,7 +892,7 @@ namespace HelloWorld
         }
 
         #endregion Share Folder with url
-    
+
         #region  Add Order to Folder
 
         private async void AddOrderToFolder()
@@ -899,7 +904,7 @@ namespace HelloWorld
             Console.Write("Please enter FolderUuid: ");
             string folderUuid = Console.ReadLine();
 
-            
+
 
             await AddOrderToFolderInternal(patientOrderUuid, new List<string>() { folderUuid });
         }
@@ -972,7 +977,7 @@ namespace HelloWorld
             Console.Write("Please enter AssignedUserUuid: ");
             string assignedUserUuid = Console.ReadLine();
 
-            
+
 
             await AssignOrderToUserInternal(patientOrderUuid, assignedUserUuid);
         }
@@ -1033,7 +1038,7 @@ namespace HelloWorld
         }
 
         #endregion Assign order to user
-        
+
         #region  Assign order to user group
 
         private async void AssignOrderToUserGroup()
@@ -1045,7 +1050,7 @@ namespace HelloWorld
             Console.Write("Please enter AssignedUserGroupUuid: ");
             string assignedUserGroupUuid = Console.ReadLine();
 
-            
+
 
             await AssignOrderToUserGroupInternal(patientOrderUuid, assignedUserGroupUuid);
         }
@@ -1106,5 +1111,137 @@ namespace HelloWorld
         }
 
         #endregion Assign order to user group
+
+        #region Create PatientOrder
+        private async void CreatePatientOrder()
+        {
+            Console.Clear();
+            Console.Write("Please enter InstitutionUuid(*required): ");
+            string institutionUuid = Console.ReadLine(); //required parameter
+
+            Console.Write("Please enter PatientName(*required): ");
+            string patientName = Console.ReadLine(); //required parameter
+
+            Console.Write("Please enter PatientId(*required): ");
+            string patientId = Console.ReadLine(); //required parameter
+
+            Console.Write("Please enter OtherPatientId: ");
+            string otherPatientId = Console.ReadLine();
+
+            Console.Write("Please enter PatientSex: ");
+            string patientSex = Console.ReadLine();
+
+            Console.Write("Please enter PatientBirthdate(*required)(format: YYYY-MM-DD): ");
+            string patientBirthdate = Console.ReadLine(); //required parameter
+
+            Console.Write("Please enter Modality(*required): ");
+            string modality = Console.ReadLine(); //required parameter
+
+            Console.Write("Please enter StudyDescription: ");
+            string studyDescription = Console.ReadLine();
+
+            Console.Write("Please enter AccessionNumber: ");
+            string accessionNumber = Console.ReadLine();
+
+            Console.Write("Please enter PatientComplaints: ");
+            string patientComplaints = Console.ReadLine();
+
+            Console.Write("Please enter OrderScheduledDatetime(YYYY-MM-DD HH:MM): ");
+            string scheduleStartDate = Console.ReadLine();
+
+            Console.Write("Please enter RequestedProcedureId: ");
+            string requestedProcedureId = Console.ReadLine();
+
+            Console.Write("Please enter RequestedProcedureDescription: ");
+            string requestedProcedureDescription = Console.ReadLine();
+
+            Console.Write("Please enter RequestingPhysician: ");
+            string requestingPhysician = Console.ReadLine();
+
+            Console.Write("Please enter ReferringPhysiciansName: ");
+            string referringPhysiciansName = Console.ReadLine();
+
+            Console.Write("Please enter ScheduledEquipmentUuid: ");
+            string scheduledEquipmentUuid = Console.ReadLine();
+
+
+
+            await CreatePatientOrderInternal(institutionUuid, patientName, patientId, otherPatientId, patientSex, patientBirthdate, modality, studyDescription, accessionNumber, patientComplaints, scheduleStartDate, requestedProcedureId, requestedProcedureDescription, requestingPhysician, referringPhysiciansName, scheduledEquipmentUuid);
+        }
+
+        private async Task CreatePatientOrderInternal(string institutionUuid, string patientName, string patientId, string otherPatientId, string patientSex, string patientBirthdate, string modality, string studyDescription, string accessionNumber, string patientComplaints, string scheduleStartDate, string requestedProcedureId, string requestedProcedureDescription, string requestingPhysician, string referringPhysiciansName, string scheduledEquipmentUuid)
+        {
+            Dictionary<string, string> parameterDictionary = new Dictionary<string, string>();
+            parameterDictionary.Add("InstitutionUuid", institutionUuid); //required parameter
+            parameterDictionary.Add("PatientName", patientName); //required parameter
+            parameterDictionary.Add("PatientId", patientId); //required parameter
+            parameterDictionary.Add("OtherPatientId", otherPatientId);
+            parameterDictionary.Add("PatientSex", patientSex);
+            parameterDictionary.Add("PatientBirthdate", patientBirthdate); //required parameter
+            parameterDictionary.Add("Modality", modality); //required parameter
+            parameterDictionary.Add("StudyDescription", studyDescription);
+            parameterDictionary.Add("AccessionNumber", accessionNumber);
+            parameterDictionary.Add("PatientComplaints", patientComplaints);
+            parameterDictionary.Add("OrderScheduledDatetime", scheduleStartDate);
+            parameterDictionary.Add("RequestedProcedureId", requestedProcedureId);
+            parameterDictionary.Add("RequestedProcedureDescription", requestedProcedureDescription);
+            parameterDictionary.Add("RequestingPhysician", requestingPhysician);
+            parameterDictionary.Add("ReferringPhysiciansName", referringPhysiciansName);
+            parameterDictionary.Add("ScheduledEquipmentUuid", scheduledEquipmentUuid);
+
+            string url = webAddress + "/createpatientorder";
+            await CreatePatientOrderDicomWebServer(url, parameterDictionary);
+        }
+
+        private async Task CreatePatientOrderDicomWebServer(string url, Dictionary<string, string> parameterDictionary)
+        {
+            try
+            {
+                string result = string.Empty;
+                HttpMessageHandler handler = new HttpClientHandler()
+                {
+                };
+
+                var httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(url),
+                    Timeout = new TimeSpan(0, 2, 0)
+                };
+
+                httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+
+                var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(userName + ":" + password);
+                string val = System.Convert.ToBase64String(plainTextBytes);
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+                httpClient.DefaultRequestHeaders.Add("CreatePatientOrderParameters", JsonConvert.SerializeObject(parameterDictionary));
+
+                HttpResponseMessage response = await httpClient.GetAsync(url);
+                Console.WriteLine("HttpResponseMessage.StatusCode = " + response.StatusCode);
+
+                using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
+                {
+                    result = stream.ReadToEnd();
+                }
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest && string.IsNullOrEmpty(result))
+                {
+                    result = response.ReasonPhrase;
+                }
+
+                Console.WriteLine("Response text =\n" + result);
+            }
+            catch (Exception ex)
+            {
+                string message = "Error while multicontent.\nReason = " + ex.Message;
+                if (ex.InnerException != null)
+                    message += "\nInnerException = " + ex.InnerException.Message;
+
+                Console.WriteLine(message);
+            }
+
+            Console.WriteLine("QidoSearch method finished. Press Enter to continue.");
+        }
+
+        #endregion Create PatientOrder
     }
 }
