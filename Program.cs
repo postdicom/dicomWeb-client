@@ -32,6 +32,7 @@ namespace HelloWorld
             Console.WriteLine("10) Assign order to user");
             Console.WriteLine("11) Assign order to user group");
             Console.WriteLine("12) Create patient order");
+            Console.WriteLine("13) Get patient order properties");
             Console.WriteLine("0) Exit");
             Console.Write("\r\nSelect an option: ");
 
@@ -82,6 +83,10 @@ namespace HelloWorld
                     return true;
                 case "12":
                     CreatePatientOrder();
+                    Console.ReadLine();
+                    return true;
+                case "13":
+                    GetPatientOrderProperties();
                     Console.ReadLine();
                     return true;
                 default:
@@ -1243,5 +1248,77 @@ namespace HelloWorld
         }
 
         #endregion Create PatientOrder
+
+        #region Get PatientOrder Properties
+
+        private async void GetPatientOrderProperties()
+        {
+            Console.Clear();
+            Console.Write("Please enter InstitutionUuid(*required): ");
+            string institutionUuid = Console.ReadLine(); //required parameter
+
+            Console.Write("Please enter PatientOrderUuid(*required): ");
+            string patientOrderUuid = Console.ReadLine(); //required parameter
+
+            await GetPatientOrderPropertiesInternal(institutionUuid, patientOrderUuid);
+        }
+
+        private async Task GetPatientOrderPropertiesInternal(string institutionUuid, string patientOrderUuid)
+        {
+            Dictionary<string, string> parameterDictionary = new Dictionary<string, string>();
+            parameterDictionary.Add("PatientOrderInstitutionUuid", institutionUuid);
+            parameterDictionary.Add("PatientOrderUuid", patientOrderUuid);
+
+            string url = webAddress + "/getpatientorderproperties";
+            await GetPatientOrderPropertiesDicomWebServer(url, parameterDictionary);
+        }
+
+        private async Task GetPatientOrderPropertiesDicomWebServer(string url, Dictionary<string, string> parameterDictionary)
+        {
+            try
+            {
+                string result = string.Empty;
+                HttpMessageHandler handler = new HttpClientHandler()
+                {
+                };
+
+                var httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(url),
+                    Timeout = new TimeSpan(0, 2, 0)
+                };
+
+                httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+
+                var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(userName + ":" + password);
+                string val = System.Convert.ToBase64String(plainTextBytes);
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+                httpClient.DefaultRequestHeaders.Add("GetPatientOrderPropertiesParameters", JsonConvert.SerializeObject(parameterDictionary));
+
+                HttpResponseMessage response = await httpClient.GetAsync(url);
+                Console.WriteLine("HttpResponseMessage.StatusCode = " + response.StatusCode);
+
+                using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
+                {
+                    result = stream.ReadToEnd();
+                }
+
+
+                Console.WriteLine("Response text =\n" + result);
+            }
+            catch (Exception ex)
+            {
+                string message = "Error while multicontent.\nReason = " + ex.Message;
+                if (ex.InnerException != null)
+                    message += "\nInnerException = " + ex.InnerException.Message;
+
+                Console.WriteLine(message);
+            }
+
+            Console.WriteLine("Method finished. Press Enter to continue.");
+        }
+
+        #endregion
     }
 }
