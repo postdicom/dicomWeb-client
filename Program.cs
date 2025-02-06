@@ -33,6 +33,7 @@ namespace HelloWorld
             Console.WriteLine("11) Assign order to user group");
             Console.WriteLine("12) Create patient order");
             Console.WriteLine("13) Get patient order properties");
+            Console.WriteLine("14) Get DICOM Tag Content by PatientOrderUuid (This method can only be used by authorized accounts. For support, contact support@postdicom.com)");
             Console.WriteLine("0) Exit");
             Console.Write("\r\nSelect an option: ");
 
@@ -87,6 +88,10 @@ namespace HelloWorld
                     return true;
                 case "13":
                     GetPatientOrderProperties();
+                    Console.ReadLine();
+                    return true;
+                case "14":
+                    GetDicomTagContent();
                     Console.ReadLine();
                     return true;
                 default:
@@ -1319,6 +1324,85 @@ namespace HelloWorld
             Console.WriteLine("Method finished. Press Enter to continue.");
         }
 
+        #endregion
+
+        #region Get DICOM Tag Content by PatientOrderUuid
+
+        private async void GetDicomTagContent()
+        {
+            Console.Clear();
+            Console.Write("Please enter InstitutionUuid(*required): ");
+            string institutionUuid = Console.ReadLine(); //required parameter
+
+            Console.Write("Please enter PatientOrderUuid(*required): ");
+            string patientOrderUuid = Console.ReadLine(); //required parameter
+
+            Console.Write("Please enter PatientSeriesUuid: ");
+            string patientSeriesUuid = Console.ReadLine();
+
+            Console.Write("Please enter TagIdList(optional, comma-separated): ");
+            string tagIdListString = Console.ReadLine();
+            List<string> tagIdList = new List<string>(tagIdListString.Split(","));
+            await GetDicomTagContentInternal(institutionUuid, patientOrderUuid, patientSeriesUuid, tagIdList);
+        }
+
+        private async Task GetDicomTagContentInternal(string institutionUuid, string patientOrderUuid, string patientSeriesUuid, List<string> tagIdList)
+        {
+            Dictionary<string, string> parameterDictionary = new Dictionary<string, string>();
+            parameterDictionary.Add("PatientOrderInstitutionUuid", institutionUuid);
+            parameterDictionary.Add("PatientOrderUuid", patientOrderUuid);
+            parameterDictionary.Add("PatientSeriesUuid", patientSeriesUuid);
+            parameterDictionary.Add("DicomTagIdList", JsonConvert.SerializeObject(tagIdList));
+
+            string url = webAddress + "/getdicomtagcontent";
+            await GetDicomTagContentDicomWebServer(url, parameterDictionary);
+        }
+
+        private async Task GetDicomTagContentDicomWebServer(string url, Dictionary<string, string> parameterDictionary)
+        {
+            try
+            {
+                string result = string.Empty;
+                HttpMessageHandler handler = new HttpClientHandler()
+                {
+                };
+
+                var httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(url),
+                    Timeout = new TimeSpan(0, 2, 0)
+                };
+
+                httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+
+                var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(userName + ":" + password);
+                string val = System.Convert.ToBase64String(plainTextBytes);
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+                httpClient.DefaultRequestHeaders.Add("GetDicomTagContentParameters", JsonConvert.SerializeObject(parameterDictionary));
+
+                HttpResponseMessage response = await httpClient.GetAsync(url);
+                Console.WriteLine("HttpResponseMessage.StatusCode = " + response.StatusCode);
+
+                using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
+                {
+                    result = stream.ReadToEnd();
+                }
+
+
+                Console.WriteLine("Response text =\n" + result);
+            }
+            catch (Exception ex)
+            {
+                string message = "Error while multicontent.\nReason = " + ex.Message;
+                if (ex.InnerException != null)
+                    message += "\nInnerException = " + ex.InnerException.Message;
+
+                Console.WriteLine(message);
+            }
+
+            Console.WriteLine("Method finished. Press Enter to continue.");
+        }
         #endregion
     }
 }
