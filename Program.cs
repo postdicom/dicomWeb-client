@@ -34,6 +34,8 @@ namespace HelloWorld
             Console.WriteLine("12) Create patient order");
             Console.WriteLine("13) Get patient order properties");
             Console.WriteLine("14) Get DICOM Tag Content by PatientOrderUuid (This method can only be used by authorized accounts. For support, contact support@postdicom.com)");
+            Console.WriteLine("15) Search for patient orders");
+            Console.WriteLine("16) Delete patient order");
             Console.WriteLine("0) Exit");
             Console.Write("\r\nSelect an option: ");
 
@@ -92,6 +94,14 @@ namespace HelloWorld
                     return true;
                 case "14":
                     GetDicomTagContent();
+                    Console.ReadLine();
+                    return true;
+                case "15":
+                    GetPatientOrderList();
+                    Console.ReadLine();
+                    return true;
+                case "16":
+                    DeletePatientOrder();
                     Console.ReadLine();
                     return true;
                 default:
@@ -1380,6 +1390,183 @@ namespace HelloWorld
                 httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
 
                 httpClient.DefaultRequestHeaders.Add("GetDicomTagContentParameters", JsonConvert.SerializeObject(parameterDictionary));
+
+                HttpResponseMessage response = await httpClient.GetAsync(url);
+                Console.WriteLine("HttpResponseMessage.StatusCode = " + response.StatusCode);
+
+                using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
+                {
+                    result = stream.ReadToEnd();
+                }
+
+
+                Console.WriteLine("Response text =\n" + result);
+            }
+            catch (Exception ex)
+            {
+                string message = "Error while multicontent.\nReason = " + ex.Message;
+                if (ex.InnerException != null)
+                    message += "\nInnerException = " + ex.InnerException.Message;
+
+                Console.WriteLine(message);
+            }
+
+            Console.WriteLine("Method finished. Press Enter to continue.");
+        }
+        #endregion
+
+        #region Get PatientOrder List
+
+        private async void GetPatientOrderList()
+        {
+            Console.Clear();
+            Console.Write("Please enter InstitutionUuidList: ");
+            string institutionUuidListString = Console.ReadLine();
+            List<string> institutionUuidList = new List<string>(institutionUuidListString.Split(","));
+
+            Console.Write("Please enter PatientName: ");
+            string patientName = Console.ReadLine();
+
+            Console.Write("Please enter PatientId: ");
+            string patientId = Console.ReadLine();
+
+            Console.Write("Please enter OtherPatientId: ");
+            string otherPatientId = Console.ReadLine();
+
+            Console.Write("Please enter AccessionNumber: ");
+            string accessionNumber = Console.ReadLine();
+
+            Console.Write("Please enter ModalityList: ");
+            string modalityListString = Console.ReadLine();
+            List<string> modalityList = new List<string>(modalityListString.Split(","));
+
+            Console.Write("Please enter StudyDateFrom(format: YYYY-MM-DD): ");
+            string studyDateFrom = Console.ReadLine();
+
+            Console.Write("Please enter StudyDateTo(format: YYYY-MM-DD): ");
+            string studyDateTo = Console.ReadLine();
+
+            Console.Write("Please enter PatientBirthdateFrom(format: YYYY-MM-DD): ");
+            string patientBirthdateFrom = Console.ReadLine();
+
+            Console.Write("Please enter PatientBirthdateTo(format: YYYY-MM-DD): ");
+            string patientBirthdateTo = Console.ReadLine();
+
+            await GetPatientOrderListInternal(institutionUuidList, patientName, patientId, otherPatientId, accessionNumber, modalityList, studyDateFrom, studyDateTo, patientBirthdateFrom, patientBirthdateTo);
+        }
+
+        private async Task GetPatientOrderListInternal(List<string> institutionUuidList, string patientName, string patientId, string otherPatientId, string accessionNumber, List<string> modalityList, string studyDateFrom, string studyDateTo, string patientbirthdateFrom, string patientBirthdateTo)
+        {
+            Dictionary<string, string> parameterDictionary = new Dictionary<string, string>();
+            parameterDictionary.Add("InstitutionUuidList", JsonConvert.SerializeObject(institutionUuidList));
+            parameterDictionary.Add("PatientName", patientName);
+            parameterDictionary.Add("PatientId", patientId);
+            parameterDictionary.Add("OtherPatientId", otherPatientId);
+            parameterDictionary.Add("AccessionNumber", accessionNumber);
+            parameterDictionary.Add("ModalityList", JsonConvert.SerializeObject(modalityList));
+
+            parameterDictionary.Add("StudyDateFrom", studyDateFrom);
+            parameterDictionary.Add("StudyDateTo", studyDateTo);
+            parameterDictionary.Add("PatientBirthdateFrom", patientbirthdateFrom);
+            parameterDictionary.Add("PatientBirthdateTo", patientBirthdateTo);
+
+            string url = webAddress + "/getpatientorderlist";
+            await GetPatientOrderListDicomWebServer(url, parameterDictionary);
+        }
+
+        private async Task GetPatientOrderListDicomWebServer(string url, Dictionary<string, string> parameterDictionary)
+        {
+            try
+            {
+                string result = string.Empty;
+                HttpMessageHandler handler = new HttpClientHandler()
+                {
+                };
+
+                var httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(url),
+                    Timeout = new TimeSpan(0, 2, 0)
+                };
+
+                httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+
+                var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(userName + ":" + password);
+                string val = System.Convert.ToBase64String(plainTextBytes);
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+                httpClient.DefaultRequestHeaders.Add("GetPatientOrderListParameters", JsonConvert.SerializeObject(parameterDictionary));
+
+                HttpResponseMessage response = await httpClient.GetAsync(url);
+                Console.WriteLine("HttpResponseMessage.StatusCode = " + response.StatusCode);
+
+                using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
+                {
+                    result = stream.ReadToEnd();
+                }
+
+
+                Console.WriteLine("Response text =\n" + result);
+            }
+            catch (Exception ex)
+            {
+                string message = "Error while multicontent.\nReason = " + ex.Message;
+                if (ex.InnerException != null)
+                    message += "\nInnerException = " + ex.InnerException.Message;
+
+                Console.WriteLine(message);
+            }
+
+            Console.WriteLine("Method finished. Press Enter to continue.");
+        }
+        #endregion
+
+        #region Delete PatientOrder
+
+        private async void DeletePatientOrder()
+        {
+            Console.Clear();
+            Console.Write("Please enter InstitutionUuid(*required): ");
+            string institutionUuid = Console.ReadLine(); //required parameter
+
+            Console.Write("Please enter PatientOrderUuid(*required): ");
+            string patientOrderUuid = Console.ReadLine(); //required parameter
+
+            await DeletePatientOrderInternal(institutionUuid, patientOrderUuid);
+        }
+
+        private async Task DeletePatientOrderInternal(string institutionUuid, string patientOrderUuid)
+        {
+            Dictionary<string, string> parameterDictionary = new Dictionary<string, string>();
+            parameterDictionary.Add("PatientOrderInstitutionUuid", institutionUuid);
+            parameterDictionary.Add("PatientOrderUuid", patientOrderUuid);
+
+            string url = webAddress + "/deleteorder";
+            await DeletePatientOrderDicomWebServer(url, parameterDictionary);
+        }
+
+        private async Task DeletePatientOrderDicomWebServer(string url, Dictionary<string, string> parameterDictionary)
+        {
+            try
+            {
+                string result = string.Empty;
+                HttpMessageHandler handler = new HttpClientHandler()
+                {
+                };
+
+                var httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(url),
+                    Timeout = new TimeSpan(0, 2, 0)
+                };
+
+                httpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+
+                var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(userName + ":" + password);
+                string val = System.Convert.ToBase64String(plainTextBytes);
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + val);
+
+                httpClient.DefaultRequestHeaders.Add("DeleteOrderParameters", JsonConvert.SerializeObject(parameterDictionary));
 
                 HttpResponseMessage response = await httpClient.GetAsync(url);
                 Console.WriteLine("HttpResponseMessage.StatusCode = " + response.StatusCode);
