@@ -342,6 +342,11 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                {
+                    result += $"\nReason: {response.ReasonPhrase}";
+                }
+
                 Console.WriteLine("Response text =\n" + result);
             }
             catch (Exception ex)
@@ -497,6 +502,12 @@ namespace HelloWorld
                 {
                     result = stream.ReadToEnd();
                 }
+
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                {
+                    result += $"\nReason: {response.ReasonPhrase}";
+                }
+
                 Console.WriteLine("RetrieveImages - Response is not multipart. Response text =\n" + result);
             }
 
@@ -574,6 +585,11 @@ namespace HelloWorld
                 using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
                 {
                     result = stream.ReadToEnd();
+                }
+
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                {
+                    result += $"\nReason: {response.ReasonPhrase}";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -655,6 +671,11 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                {
+                    result += $"\nReason: {response.ReasonPhrase}";
+                }
+
                 Console.WriteLine("Response text =\n" + result);
             }
             catch (Exception ex)
@@ -728,6 +749,11 @@ namespace HelloWorld
                 using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
                 {
                     result = stream.ReadToEnd();
+                }
+
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                {
+                    result += $"\nReason: {response.ReasonPhrase}";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -807,6 +833,10 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                {
+                    result += $"\nReason: {response.ReasonPhrase}";
+                }
 
                 Console.WriteLine("Response text =\n" + result);
             }
@@ -897,6 +927,11 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                {
+                    result += $"\nReason: {response.ReasonPhrase}";
+                }
+
                 Console.WriteLine("Response text =\n" + result);
             }
             catch (Exception ex)
@@ -968,6 +1003,11 @@ namespace HelloWorld
                 using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
                 {
                     result = stream.ReadToEnd();
+                }
+
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                {
+                    result += $"\nReason: {response.ReasonPhrase}";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -1043,6 +1083,11 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                {
+                    result += $"\nReason: {response.ReasonPhrase}";
+                }
+
                 Console.WriteLine("Response text =\n" + result);
             }
             catch (Exception ex)
@@ -1114,6 +1159,11 @@ namespace HelloWorld
                 using (StreamReader stream = new StreamReader(response.Content.ReadAsStreamAsync().Result, System.Text.Encoding.UTF8))
                 {
                     result = stream.ReadToEnd();
+                }
+
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                {
+                    result += $"\nReason: {response.ReasonPhrase}";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -1243,9 +1293,10 @@ namespace HelloWorld
                 {
                     result = stream.ReadToEnd();
                 }
-                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest && string.IsNullOrEmpty(result))
+
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
                 {
-                    result = response.ReasonPhrase;
+                    result += $"\nReason: {response.ReasonPhrase}";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -1259,7 +1310,7 @@ namespace HelloWorld
                 Console.WriteLine(message);
             }
 
-            Console.WriteLine("QidoSearch method finished. Press Enter to continue.");
+            Console.WriteLine("Method finished. Press Enter to continue.");
         }
 
         #endregion Create PatientOrder
@@ -1319,6 +1370,10 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                {
+                    result += $"\nReason: {response.ReasonPhrase}";
+                }
 
                 Console.WriteLine("Response text =\n" + result);
             }
@@ -1333,7 +1388,6 @@ namespace HelloWorld
 
             Console.WriteLine("Method finished. Press Enter to continue.");
         }
-
         #endregion
 
         #region Get DICOM Tag Content by PatientOrderUuid
@@ -1399,6 +1453,10 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                {
+                    result += $"\nReason: {response.ReasonPhrase}";
+                }
 
                 Console.WriteLine("Response text =\n" + result);
             }
@@ -1505,6 +1563,10 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                {
+                    result += $"\nReason: {response.ReasonPhrase}";
+                }
 
                 Console.WriteLine("Response text =\n" + result);
             }
@@ -1576,6 +1638,10 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
+                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                {
+                    result += $"\nReason: {response.ReasonPhrase}";
+                }
 
                 Console.WriteLine("Response text =\n" + result);
             }
