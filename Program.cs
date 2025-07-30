@@ -342,9 +342,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -503,9 +508,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("RetrieveImages - Response is not multipart. Response text =\n" + result);
@@ -587,9 +597,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -671,9 +686,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -751,9 +771,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -833,9 +858,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -927,9 +957,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -1005,9 +1040,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -1083,9 +1123,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -1161,9 +1206,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -1294,9 +1344,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -1370,9 +1425,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -1453,9 +1513,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -1563,9 +1628,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
@@ -1638,9 +1708,14 @@ namespace HelloWorld
                     result = stream.ReadToEnd();
                 }
 
-                if (!string.IsNullOrEmpty(response.ReasonPhrase))
+                if (response.Headers.TryGetValues("X-Error-Reason", out var errorReasonValues))
                 {
-                    result += $"\nReason: {response.ReasonPhrase}";
+                    string errorReason = errorReasonValues.FirstOrDefault();
+                    result += $"\nReason: {errorReason}";
+                }
+                else
+                {
+                    result += "Unexpected error. Please contact the PostDICOM Support.";
                 }
 
                 Console.WriteLine("Response text =\n" + result);
